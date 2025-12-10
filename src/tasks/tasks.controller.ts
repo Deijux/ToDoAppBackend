@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Put,
@@ -20,13 +19,13 @@ export class TasksController {
 
   @Get()
   @HttpCode(200)
-  findAll(): Task[] {
+  async findAll(): Promise<Task[]> {
     return this.tasksService.findAll();
   }
 
   @Get(':id')
   @HttpCode(200)
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.tasksService.findOne(id);
   }
 
@@ -38,19 +37,19 @@ export class TasksController {
 
   @Put(':id')
   @HttpCode(200)
-  update(@Param('id', ParseIntPipe) id: number, @Body() task: Task) {
+  update(@Param('id') id: string, @Body() task: Task) {
     return this.tasksService.update(id, task);
   }
 
   @Patch('/status/:id')
   @HttpCode(200)
-  changeStatus(@Param('id', ParseIntPipe) id: number) {
+  changeStatus(@Param('id') id: string) {
     return this.tasksService.changeStatus(id);
   }
 
   @Delete(':id')
   @HttpCode(200)
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id') id: string) {
     return this.tasksService.delete(id);
   }
 }

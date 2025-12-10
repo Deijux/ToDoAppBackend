@@ -1,58 +1,52 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Task } from './interface/task.interface';
 import { CreateTaskDto } from './dto/createTask.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Task } from './schemas/task.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TasksService {
+  constructor(@InjectModel(Task.name) private taskModel: Model<Task>) {}
   private readonly Tasks: Task[] = [];
 
-  create(task: CreateTaskDto): Task {
-    const newTask: Task = {
-      id: this.Tasks.length + 1,
-      title: task.title,
-      description: task?.description,
-      completed: false,
-    };
-    this.Tasks.push(newTask);
-    return newTask;
+  async create(task: CreateTaskDto): Promise<Task> {
+    const createdTask = new this.taskModel(task);
+    return await createdTask.save();
   }
 
-  findAll(): Task[] {
-    return this.Tasks;
+  async findAll(): Promise<Task[]> {
+    return await this.taskModel.find().exec();
   }
 
-  findOne(id: number): Task | undefined {
-    return this.Tasks.find((task) => task.id === id);
-  }
-
-  update(id: number, task: Task) {
-    const index = this.Tasks.findIndex((t) => t.id === id);
-
-    if (index === -1) throw new NotFoundException(`Tarea no existe`);
-
-    const updatedTask = {
-      ...this.Tasks[index],
-      ...task,
-    };
-    this.Tasks[index] = updatedTask;
-    return updatedTask;
-  }
-
-  changeStatus(id: number): Task {
-    const task = this.Tasks.find((task) => task.id === id);
-
-    if (!task) throw new NotFoundException(`Tarea no existe`);
-
-    task.completed = !task.completed;
+  async findOne(id: string): Promise<Task> {
+    const task = await this.taskModel.findById(id).exec();
+    if (!task) {
+      throw new NotFoundException(`No se encontró la tarea con el ID: ${id} `);
+    }
     return task;
   }
 
-  delete(id: number) {
-    const task = this.Tasks.find((task) => task.id === id);
+  async update(id: string, task: Task): Promise<Task | null> {
+    await this.findOne(id);
+    return await this.taskModel
+      .findOneAndUpdate({ _id: id }, task, { new: true })
+      .exec();
+  }
 
-    if (!task) throw new NotFoundException(`Tarea no existe`);
+  async changeStatus(id: string): Promise<Task | null> {
+    const task = await this.findOne(id);
+    return await this.taskModel
+      .findOneAndUpdate(
+        { _id: id },
+        { completed: !task.completed },
+        { new: true },
+      )
+      .exec();
+  }
 
-    const taskIndex = this.Tasks.findIndex((task) => task.id === id);
-    this.Tasks.splice(taskIndex, 1);
+  async delete(id: string) {
+    await this.findOne(id);
+
+    await this.taskModel.deleteOne({ _id: id }).exec();
   }
 }
