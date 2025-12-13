@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('No se encontró el token');
     }
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
     return true;
   }
   private extractTokenFromHeader(request: Request): string | undefined {
-    const token = request.cookies?.acces_token as string | undefined;
+    const token = request.cookies?.access_token as string | undefined;
     if (!token) return undefined;
     return token;
   }
