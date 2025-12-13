@@ -3,15 +3,14 @@ import { CreateTaskDto } from './dto/createTask.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Task } from './schemas/task.schema';
 import { Model } from 'mongoose';
+import { JwtPayload } from 'src/auth/interface/jwtPayload.interface';
 
 @Injectable()
 export class TasksService {
   constructor(@InjectModel(Task.name) private taskModel: Model<Task>) {}
-  private readonly Tasks: Task[] = [];
 
-  async create(task: CreateTaskDto): Promise<Task> {
-    const createdTask = new this.taskModel(task);
-    return await createdTask.save();
+  async create(task: CreateTaskDto, user: JwtPayload): Promise<Task> {
+    return this.taskModel.create({ ...task, user: user.sub });
   }
 
   async findAll(): Promise<Task[]> {

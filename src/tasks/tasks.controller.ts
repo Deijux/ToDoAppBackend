@@ -4,51 +4,68 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
   Put,
+  Req,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import type { Task } from './interface/task.interface';
 import { CreateTaskDto } from './dto/createTask.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtPayload } from 'src/auth/interface/jwtPayload.interface';
+
+interface reqCreate extends Request {
+  user?: JwtPayload;
+}
 
 @Controller('tasks')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async findAll(): Promise<Task[]> {
     return this.tasksService.findAll();
   }
 
   @Get(':id')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
     return this.tasksService.findOne(id);
   }
 
+  @UseGuards(AuthGuard)
   @Post()
-  @HttpCode(201)
-  create(@Body() task: CreateTaskDto) {
-    return this.tasksService.create(task);
+  @HttpCode(HttpStatus.CREATED)
+  create(@Req() req: reqCreate, @Body() task: CreateTaskDto) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException(
+        'No se obtuvo el usuario al crear la tarea',
+      );
+    }
+    return this.tasksService.create(task, user);
   }
 
   @Put(':id')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() task: Task) {
     return this.tasksService.update(id, task);
   }
 
   @Patch('/status/:id')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   changeStatus(@Param('id') id: string) {
     return this.tasksService.changeStatus(id);
   }
 
   @Delete(':id')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   delete(@Param('id') id: string) {
     return this.tasksService.delete(id);
   }

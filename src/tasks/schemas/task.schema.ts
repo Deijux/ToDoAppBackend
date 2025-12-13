@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { User } from '../../users/schemas/user.schema';
 
 export type taskDocument = HydratedDocument<Task>;
 
@@ -13,6 +14,9 @@ export class Task {
 
   @Prop({ type: Boolean, default: false })
   completed: boolean;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  user: User;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
