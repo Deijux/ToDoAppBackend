@@ -13,8 +13,8 @@ export class TasksService {
     return this.taskModel.create({ ...task, user: user.sub });
   }
 
-  async findAll(): Promise<Task[]> {
-    return await this.taskModel.find().exec();
+  async findUserTasks(userId: string): Promise<Task[]> {
+    return await this.taskModel.find({ user: userId });
   }
 
   async findOne(id: string): Promise<Task> {

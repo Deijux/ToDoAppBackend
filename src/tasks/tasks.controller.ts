@@ -27,10 +27,17 @@ interface reqCreate extends Request {
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll(): Promise<Task[]> {
-    return this.tasksService.findAll();
+  async findAll(@Req() req: reqCreate): Promise<Task[]> {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException(
+        'No se obtuvo el usuario al buscar tareas',
+      );
+    }
+    return this.tasksService.findUserTasks(user.sub);
   }
 
   @Get(':id')
