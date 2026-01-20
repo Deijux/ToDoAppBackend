@@ -38,6 +38,10 @@ export class AuthService {
     if (!isMatch) throw new UnauthorizedException('Credenciales incorrectas');
 
     const payload = { sub: findUser._id, email: findUser.email };
-    return await this.jwtService.signAsync(payload);
+    return {
+      access_token: this.jwtService.sign(payload),
+      sub: findUser._id,
+      email: findUser.email,
+    };
   }
 }
