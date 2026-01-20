@@ -16,7 +16,7 @@ import {
 import { TasksService } from './tasks.service';
 import type { Task } from './interface/task.interface';
 import { CreateTaskDto } from './dto/createTask.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { JwtPayload } from 'src/auth/interface/jwtPayload.interface';
 import {
   ApiBearerAuth,
@@ -37,7 +37,7 @@ interface reqCreate extends Request {
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all tasks of the authenticated user' })
@@ -59,6 +59,7 @@ export class TasksController {
     return this.tasksService.findUserTasks(user.sub);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a task by ID' })
@@ -79,7 +80,7 @@ export class TasksController {
     return this.tasksService.findOne(id);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new task' })
@@ -105,6 +106,7 @@ export class TasksController {
     return this.tasksService.create(task, user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a task by ID' })
@@ -126,6 +128,7 @@ export class TasksController {
     return this.tasksService.update(id, task);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/status/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Toggle task completed status' })
@@ -146,6 +149,7 @@ export class TasksController {
     return this.tasksService.changeStatus(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a task by ID' })
