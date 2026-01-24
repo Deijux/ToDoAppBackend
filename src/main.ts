@@ -13,7 +13,7 @@ async function bootstrap() {
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory);
 
   app.use(cookieParser());
   app.useGlobalPipes(
@@ -21,12 +21,16 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
   app.enableCors({
-    origin: ['http://localhost:3001'],
+    origin: ['http://localhost:8000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
+
+  app.setGlobalPrefix('api');
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
