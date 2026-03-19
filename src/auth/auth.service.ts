@@ -42,6 +42,8 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       sub: findUser._id,
       email: findUser.email,
+      firstName: findUser.firstName,
+      lastName: findUser.lastName,
     };
   }
 }

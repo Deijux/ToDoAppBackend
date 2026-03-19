@@ -72,7 +72,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Body() user: LoginUser,
   ) {
-    const { access_token, sub, email } = await this.authService.signIn(user);
+    const { access_token, sub, email, firstName, lastName } =
+      await this.authService.signIn(user);
     response.cookie('access_token', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -82,6 +83,8 @@ export class AuthController {
     return {
       sub,
       email,
+      firstName,
+      lastName,
     };
   }
 
