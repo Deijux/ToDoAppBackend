@@ -9,12 +9,16 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(user: CreateUserDto) {
-    const userRegistred = await this.findOne(user.email);
+    const userRegistred = await this.findByEmail(user.email);
     if (userRegistred) throw new ConflictException('El correo está en uso');
     await this.userModel.create(user);
   }
 
-  async findOne(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<User | null> {
     return await this.userModel.findOne({ email: email });
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return await this.userModel.findById(id);
   }
 }

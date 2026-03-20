@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   async signIn(user: LoginUser) {
-    const findUser = await this.usersService.findOne(user.email);
+    const findUser = await this.usersService.findByEmail(user.email);
     if (!findUser)
       throw new NotFoundException(
         `No se encontró usuario para el correo ${user.email}`,

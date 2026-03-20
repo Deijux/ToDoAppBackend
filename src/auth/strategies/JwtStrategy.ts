@@ -21,13 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    console.log('Payload recibido en JwtStrategy:', payload);
-
     if (!payload) {
       throw new UnauthorizedException();
     }
 
-    const user = await this.usersService.findOne(payload.sub);
+    const user = await this.usersService.findById(payload.sub);
 
     if (!user) {
       throw new UnauthorizedException('User no longer exists');
